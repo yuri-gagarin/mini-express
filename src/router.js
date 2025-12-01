@@ -1,3 +1,4 @@
+const parseUrl = require("parseurl");
 const setPrototypeOf = require("setprototypeof");
 
 const Route = require("./route");
@@ -35,13 +36,58 @@ proto.route = function route(path) {
 };
 
 proto.handle = function handle(req, res, out) {
-  let self = this;
-  let stack = self.stack;
-  let layer = stack[0];
-  let route = layer.route;
-  console.log(route.stack[0]);
-  route.stack[0].handle_request(req, res);
+  try {
+    let self = this;
+    let stack = self.stack;
+    let path = getPathName(req);
 
+
+    let layer;
+    let match;
+    let route;
+    let index = 0;
+
+    while (match !== true && index < stack.length) {
+      layer = stack[index++];
+      match = matchLayer(layer, path);
+      route = layer.route;
+
+      if (match !== true) {
+        continue;
+      }
+
+      if (!route) {
+        // process non route handler normally
+        continue;
+      }
+
+      route.stack[0].handle_request(req, res);
+    }
+  } catch (error) {
+    console.log("Module: Router - [proto.handle] Error");
+    console.error(error);
+    process.exit(1);
+  }
 };
+
+function getPathName(req) {
+  try {
+    return parseUrl(req).pathname;
+  } catch (error) {
+    console.log("Module: Router - [getPathName] Error");
+    console.error(error);
+    process.exit(1);
+  }
+}
+
+function matchLayer(layer, path) {
+  try {
+    return layer.match(path);
+  } catch (error) {
+    console.log("Module: Router - [matchLayer] Error");
+    console.error(error);
+    process.exit(1);
+  }
+}
 
 

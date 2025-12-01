@@ -1,5 +1,8 @@
 const http = require("http");
 const methods = require("methods");
+const setPrototypeOf = require("setprototypeof");
+
+const Layer = require("./layer");
 const Router = require("./router");
 
 const app = exports = module.exports = {};
@@ -19,6 +22,31 @@ app.lazyrouter = function lazyrouter() {
     this._router = new Router({});
   }
 };
+
+app.set = function set(setting, val) {
+  this.settings[setting] = val;
+
+  switch (setting) {
+    case "etag": {
+      this.set("etag fn", "");
+      break;
+    }
+    case "query parser": {
+      this.set("query parser fn", "");
+      break;
+    }
+    case "trust proxy": {
+      this.set("trust proxy fn", "");
+      break;
+    } 
+  }
+
+  return this;
+}
+
+app.enabled = function enabled(setting) {
+  return Boolean(this.set(setting));  
+}
 
 app.listen = function listen() {
   const server = http.createServer(this);

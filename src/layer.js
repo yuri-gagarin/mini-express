@@ -24,6 +24,7 @@ Layer.prototype.handle_request = function handle(req, res, next) {
   } catch (error) {
     console.log("Module: Layer - Error");
     console.error(error);
+    process.exit(1);
   }
 };
 
