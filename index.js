@@ -1,22 +1,29 @@
 const express = require("./src/express");
 const app = express();
 
-app.get("/", (req, res) => {
+app.get("/users", (req, res, next) => {
   res.writeHead(200);
-  res.write("Hello world from custom express");
+  res.write("Mock Users list");
   res.end();
 });
 
-app.get("/about", (req, res) => {
+app.post("/users", (req, res) => {
   res.writeHead(200);
-  res.write("About page");
+  res.write("Creating user...")
+  res.write("User created!");
   res.end();
 });
 
-app.post("/data", (req, res) => {
-  res.write('Data from post :)');
-  res.end();
-});
+// app.get("/about", (req, res) => {
+//   res.writeHead(200);
+//   res.write("About page");
+//   res.end();
+// });
+
+// app.post("/about", (req, res) => {
+//   res.write('Data from post :)');
+//   res.end();
+// });
 
 app.listen(3000, () => {
   console.log("Example app listening at port 3000");

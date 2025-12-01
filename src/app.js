@@ -60,7 +60,7 @@ app.handle = function handle(req, res, next) {
 
 methods.forEach(function(method) {
   app[method] = function(path) {
-
+    console.log(`Defining app.${method} for path: `, path);
     this.lazyrouter();
 
     const route = this._router.route(path);

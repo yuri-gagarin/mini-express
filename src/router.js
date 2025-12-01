@@ -26,6 +26,18 @@ const proto = module.exports = function(options) {
 };
 
 proto.route = function route(path) {
+  console.log("Creating route for path: ", path);
+
+  // Look for existing route with this path
+  for (let i = 0; i < this.stack.length; i++) {
+    let layer = this.stack[i];
+    if (layer.route && layer.route.path === path) {
+      console.log("Reusing existing route for path: ", path);
+      return layer.route;
+    }
+  }
+
+  // Create new route if none exists
   let route = new Route(path);
   let layer = new Layer(path, {}, route.dispatch.bind(route));
 
@@ -36,37 +48,46 @@ proto.route = function route(path) {
 };
 
 proto.handle = function handle(req, res, out) {
-  try {
     let self = this;
     let stack = self.stack;
-    let path = getPathName(req);
-
-
-    let layer;
-    let match;
-    let route;
     let index = 0;
 
-    while (match !== true && index < stack.length) {
-      layer = stack[index++];
-      match = matchLayer(layer, path);
-      route = layer.route;
+    next();
 
-      if (match !== true) {
-        continue;
+    function next() {
+      try {
+      // resolve the URL path from the {req} object
+      let path = getPathName(req);
+
+      let layer;
+      let match;
+      let route;
+
+      while (match !== true && index < stack.length) {
+        layer = stack[index++];
+        match = matchLayer(layer, path);
+        route = layer.route;
+        console.log("Route found: ", route);
+        console.log("Method: ", req.method);
+
+        if (match !== true) {
+          continue;
+        }
+
+        if (!route) {
+          // process non route handler normally
+          continue;
+        }
+
+        // Let the route handle method matching
+        route.dispatch(req, res, next);
+        return;
       }
-
-      if (!route) {
-        // process non route handler normally
-        continue;
-      }
-
-      route.stack[0].handle_request(req, res);
+    } catch (error) {
+      console.log("Module: Router - [proto.handle] Error");
+      console.error(error);
+      process.exit(1);
     }
-  } catch (error) {
-    console.log("Module: Router - [proto.handle] Error");
-    console.error(error);
-    process.exit(1);
   }
 };
 

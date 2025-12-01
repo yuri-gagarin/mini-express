@@ -18,7 +18,10 @@ Layer.prototype.match = function match(path) {
 
 Layer.prototype.handle_request = function handle(req, res, next) {
   let fn = this.handle;
-
+  console.log("This context: ", this);
+  console.log("Handling request in Layer: ", this.name);
+  console.log("Layer method: ", this.method);
+  console.log("Method: ", req.method);
   try {
     fn(req, res, next);
   } catch (error) {
