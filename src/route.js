@@ -12,25 +12,29 @@ function Route(path) {
 Route.prototype.dispatch = function dispatch(req, res, done) {
   let method = req.method.toLowerCase();
   
-  // Find handler for this method in the route's stack
+  // Check if this method is defined for this route
   console.log("Processing method in route.dispatch: ", method.toUpperCase());
   console.log("Requested URL: ", req.url);
   console.log("Route path: ", this.path); 
   console.log("Route defined methods: ", this.methods);
 
+  if (!this.methods[method]) {
+    // Method not allowed - return 405
+    const allowerdMethods = Object.keys(this.methods).join(', ').toUpperCase();
+    res.statusCode = 405;
+  
+    res.setHeader('Allow', allowerdMethods);
+    res.end('Method Not Allowed');
+    return;
+  }
+
+  // Find and call the handler for this method
   for (let i = 0; i < this.stack.length; i++) {
     let layer = this.stack[i];
     if (layer.method === method) {
       layer.handle_request(req, res, done);
       return;
     }
-  }
-  
-  // Method not found - return 405 if route has methods
-  if (Object.keys(this.methods).length > 0) {
-    res.statusCode = 405;
-    res.setHeader('Allow', Object.keys(this.methods).join(', ').toUpperCase());
-    res.end('Method Not Allowed');
   }
 };
 

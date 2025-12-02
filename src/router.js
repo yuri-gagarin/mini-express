@@ -51,7 +51,9 @@ proto.handle = function handle(req, res, out) {
     let self = this;
     let stack = self.stack;
     let index = 0;
+    console.log("Router handling request for URL: ", req.url);
 
+    
     next();
 
     function next() {
@@ -83,6 +85,11 @@ proto.handle = function handle(req, res, out) {
         route.dispatch(req, res, next);
         return;
       }
+
+      console.log("No matching route found for URL: ", req.url);
+      res.statusCode = 404;
+      res.end("Cannot " + req.method + " " + req.url);
+
     } catch (error) {
       console.log("Module: Router - [proto.handle] Error");
       console.error(error);
