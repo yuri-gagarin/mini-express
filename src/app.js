@@ -5,6 +5,8 @@ const setPrototypeOf = require("setprototypeof");
 const Layer = require("./layer");
 const Router = require("./router");
 
+const middleware = require("./middleware/init");
+
 const app = exports = module.exports = {};
 const slice = Array.prototype.slice;
 
@@ -15,12 +17,16 @@ app.init = function() {
 
   // app router ?
   this._router = null;
+
+  // console.log(this);
 };
 
 app.lazyrouter = function lazyrouter() {
   if (!this._router) {
     this._router = new Router({});
   }
+
+  this._router(middleware.init(this));
 };
 
 app.set = function set(setting, val) {

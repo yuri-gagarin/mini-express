@@ -86,9 +86,16 @@ proto.handle = function handle(req, res, out) {
         return;
       }
 
-      console.log("No matching route found for URL: ", req.url);
-      res.statusCode = 404;
-      res.end("Cannot " + req.method + " " + req.url);
+      if (match) {
+        console.log("Non Layer matched");
+        console.log(route);
+      }
+
+      if (req && typeof req === "object" &&  req.method && req.url) {
+        console.log("No matching route found for URL: ", req.url);
+        res.statusCode = 404;
+        res.end("Cannot " + req.method + " " + req.url);
+      }
 
     } catch (error) {
       console.log("Module: Router - [proto.handle] Error");
@@ -98,9 +105,26 @@ proto.handle = function handle(req, res, out) {
   }
 };
 
+proto.use = function use(fn) {
+  const layer = new Layer("/", {}, fn);
+  layer.route = null;
+
+  this.stack.push(layer);
+
+  return this;
+}
+
 function getPathName(req) {
   try {
-    return parseUrl(req).pathname;
+    if (req && typeof req === "object") {
+      console.log("Req object is: ", req);
+      console.log("Parsing URL for request: ", req.url);
+      return parseUrl(req).pathname;
+    }
+    if (req && typeof req === "function") {
+      return "";
+    }
+    return null;
   } catch (error) {
     console.log("Module: Router - [getPathName] Error");
     console.error(error);
