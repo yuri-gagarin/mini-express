@@ -4,6 +4,7 @@ const app = express();
 app.get("/users", (req, res, next) => {
   res.writeHead(200);
   res.write("Mock Users list");
+  res.send("Mock Users list");
   res.end();
 });
 

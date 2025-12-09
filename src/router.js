@@ -52,7 +52,7 @@ proto.handle = function handle(req, res, out) {
     let stack = self.stack;
     let index = 0;
     console.log("Router handling request for URL: ", req.url);
-
+    console.log("Stack is the following: ", stack);
     
     next();
 
@@ -86,9 +86,12 @@ proto.handle = function handle(req, res, out) {
         return;
       }
 
+      console.log("Match result: ", match);
       if (match) {
         console.log("Non Layer matched");
-        console.log(route);
+        console.log(layer);
+        layer.handle_request(req, res, next);
+        return;
       }
 
       if (req && typeof req === "object" &&  req.method && req.url) {
@@ -117,7 +120,6 @@ proto.use = function use(fn) {
 function getPathName(req) {
   try {
     if (req && typeof req === "object") {
-      console.log("Req object is: ", req);
       console.log("Parsing URL for request: ", req.url);
       return parseUrl(req).pathname;
     }

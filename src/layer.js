@@ -13,7 +13,16 @@ function Layer(path, options, fn) {
 };
 
 Layer.prototype.match = function match(path) {
-  return this.route.path === path;
+  console.log("Match name: ", this.name);
+  if (this.route && this.route.path === path) {
+    return true;
+  }
+  if (this.name === "expressInit") {
+    console.log("Matchig inits: ")
+    return true;
+  }
+
+  return false;
 };
 
 Layer.prototype.handle_request = function handle(req, res, next) {

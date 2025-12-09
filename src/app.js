@@ -23,10 +23,11 @@ app.init = function() {
 
 app.lazyrouter = function lazyrouter() {
   if (!this._router) {
+    console.log("Initializing router in app.lazyrouter");
     this._router = new Router({});
+    this._router.use(middleware.init(this));
   }
 
-  this._router(middleware.init(this));
 };
 
 app.set = function set(setting, val) {
