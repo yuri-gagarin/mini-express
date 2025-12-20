@@ -1,30 +1,23 @@
 const express = require("./src/express");
 const app = express();
 
+app.get("/user", (req, res, next) => {
+  res.send({ id: 1, name: "John Doe" });
+});
+
 app.get("/users", (req, res, next) => {
-  res.writeHead(200);
-  res.write("Mock Users list");
-  res.send("Mock Users list");
-  res.end();
+  res.send([{ id: 1, name: "John Doe" }, { id: 2, name: "Jane Smith" }]);
 });
 
 app.post("/users", (req, res) => {
-  res.writeHead(200);
-  res.write("Creating user...")
-  res.write("User created!");
-  res.end();
+  return res.status(201).send("Creating user...");
 });
 
-// app.get("/about", (req, res) => {
-//   res.writeHead(200);
-//   res.write("About page");
-//   res.end();
-// });
 
-// app.post("/about", (req, res) => {
-//   res.write('Data from post :)');
-//   res.end();
-// });
+app.get("/about", (req, res) => {
+  return res.redirect("/user");
+});
+
 
 app.listen(3000, () => {
   console.log("Example app listening at port 3000");

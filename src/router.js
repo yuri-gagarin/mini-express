@@ -97,7 +97,7 @@ proto.handle = function handle(req, res, out) {
       if (req && typeof req === "object" &&  req.method && req.url) {
         console.log("No matching route found for URL: ", req.url);
         res.statusCode = 404;
-        res.end("Cannot " + req.method + " " + req.url);
+        res.end(`Route: ${req.method} ${req.url} Not Found`);
       }
 
     } catch (error) {
