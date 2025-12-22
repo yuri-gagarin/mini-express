@@ -31,11 +31,32 @@ app.lazyrouter = function lazyrouter() {
 };
 
 // for the static middleware? //
+// to support prefixes //
 app.use = function use(fn) {
+  // this.lazyrouter();
+  // this._router.use(fn);
+  // return this;
+  let offset = 0;
+  let path = "/";
+
+  // if the first argument is a string, treat it as the path
+  if (typeof fn === "string") {
+    path = fn;
+    offset = 1;
+  }
+
   this.lazyrouter();
-  this._router.use(fn);
+
+  const callbacks = Array.prototype.slice.call(arguments, offset);
+
+  for (const callback of callbacks) {
+    console.log("Adding middleware for path: ", path);
+    this._router.use(path, callback);
+  }
+
   return this;
-}
+};
+
 
 app.set = function set(setting, val) {
   this.settings[setting] = val;

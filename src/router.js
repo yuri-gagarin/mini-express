@@ -110,14 +110,19 @@ proto.handle = function handle(req, res, out) {
   }
 };
 
-proto.use = function use(fn) {
-  const layer = new Layer("/", {}, fn);
+proto.use = function use(path, fn) {
+  // handle optional path argument
+  if (typeof path === "function") {
+    fn = path;
+    path = "/";
+  }
+
+  const layer = new Layer(path, {}, fn);
   layer.route = null;
 
   this.stack.push(layer);
-
   return this;
-}
+};
 
 function getPathName(req) {
   try {

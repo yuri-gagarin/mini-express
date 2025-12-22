@@ -25,17 +25,38 @@ Layer.prototype.match = function match(path) {
     if (this.path === "/") {
       return true;
     }
+
+    // check for a mount path
+    if (path.startsWith(this.path)) {
+      return true;
+    } 
   }
 
   return false;
 };
 
 Layer.prototype.handle_request = function handle(req, res, next) {
+  console.log("Layer handling request for path: ", this.path);
   let fn = this.handle;
-  console.log("This context: ", this);
-  console.log("Handling request in Layer: ", this.name);
-  console.log("Layer method: ", this.method);
-  console.log("Method: ", req.method);
+  
+  // For middleware (no route), strip the mount path from req.url
+  if (!this.route && this.path !== '/') {
+    console.log("Running middleware named: ", this.name);
+    const originalUrl = req.url;
+    
+    // Strip the mount path
+    if (req.url.startsWith(this.path)) {
+      req.url = req.url.slice(this.path.length) || '/';
+    }
+    
+    // Restore after middleware completes
+    const originalNext = next;
+    next = function() {
+      req.url = originalUrl;
+      originalNext();
+    };
+  }
+  
   try {
     fn(req, res, next);
   } catch (error) {
