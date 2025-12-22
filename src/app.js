@@ -30,6 +30,13 @@ app.lazyrouter = function lazyrouter() {
 
 };
 
+// for the static middleware? //
+app.use = function use(fn) {
+  this.lazyrouter();
+  this._router.use(fn);
+  return this;
+}
+
 app.set = function set(setting, val) {
   this.settings[setting] = val;
 

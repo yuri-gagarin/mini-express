@@ -8,18 +8,23 @@ function Layer(path, options, fn) {
   this.handle = fn;
   this.name = fn.name || "<anonymous>";
   this.params = null;
-  this.path = null;
+  this.path = path;
 
 };
 
 Layer.prototype.match = function match(path) {
   console.log("Match name: ", this.name);
+
+  // matching a specific rout
   if (this.route && this.route.path === path) {
     return true;
   }
-  if (this.name === "expressInit") {
-    console.log("Matchig inits: ")
-    return true;
+
+  // MIDDLEWARE matching
+  if (!this.route) {
+    if (this.path === "/") {
+      return true;
+    }
   }
 
   return false;

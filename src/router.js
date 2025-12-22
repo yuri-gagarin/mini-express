@@ -69,16 +69,18 @@ proto.handle = function handle(req, res, out) {
         layer = stack[index++];
         match = matchLayer(layer, path);
         route = layer.route;
-        console.log("Route found: ", route);
-        console.log("Method: ", req.method);
+        // console.log("Route found: ", route);
+        // console.log("Method: ", req.method);
 
         if (match !== true) {
           continue;
         }
 
         if (!route) {
-          // process non route handler normally
-          continue;
+          // process non route handler (middleware)
+          console.log("Calling static!")
+          layer.handle_request(req, res, next);
+          return;
         }
 
         // Let the route handle method matching
@@ -86,7 +88,7 @@ proto.handle = function handle(req, res, out) {
         return;
       }
 
-      console.log("Match result: ", match);
+      // console.log("Match result: ", match);
       if (match) {
         console.log("Non Layer matched");
         console.log(layer);

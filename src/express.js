@@ -120,6 +120,41 @@ function createApplication() {
   return app;
 };
 
+exports.static = function(root) {
+
+  const rootPath = path.resolve(root);
+
+  return function staticMiddleware(req, res, next) {
+    // Only GET and HEAD requests
+    const allowed = ["GET", "HEAD"];
+
+    if (!allowed.includes(req.method)) {
+      console.log("Not allowed");
+      return next();
+    }
+    // check if file exists
+    const filePath = path.join(rootPath, req.url);
+    fs.stat(filePath, (err, stats) => {
+      if (err || !stats.isFile()) {
+        // file does not exists, pass to the next handler
+        return next();
+      }
+
+      // otherwise we will server the file
+      const ext = path.extname(filePath).toLowerCase().slice(1);
+      const contentType = mimeTypes[ext || "application/octet-stream"];
+
+      fs.readFile(filePath, (err, data) => {
+        if (err) return next(err);
+
+        // set header and send
+        res.setHeader("Content-Type", contentType);
+        res.end(data);
+      });
+    });
+  };
+};
+
 exports.application = proto;
 
 
