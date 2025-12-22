@@ -1,6 +1,11 @@
 const http = require("http");
+const fs = require("fs");
 const mixin = require("merge-descriptors");
+const path = require("path");
+//
 const proto = require("./app");
+//
+const { mimeTypes } = require("./constants/mime_types");
 
 exports = module.exports = createApplication;
 
@@ -74,9 +79,35 @@ function createApplication() {
     this.statusCode = status;
     this.setHeader("Location", url);
     this.end();
-  }
+  };
 
-  
+  res.sendFile = function(filePath, options) {
+    // grab absolute path 
+    const absolutePath = path.resolve(filePath);
+
+    // whatever we are sending it has to exist, otherwise error
+    fs.stat(absolutePath, (err, stats) => {
+      if (err || !stats.isFile()) {
+        this.statusCode = 404;
+        this.end(`File: ${filePath} not found!`);
+      }
+    });
+
+    // Resolve the Content-Type from the filename
+    const ext = path.extname(absolutePath).toLowerCase().slice(1);
+    const contentType = mimeTypes[ext] || "application/octet-stream";
+
+    fs.readFile(absolutePath, (err, data) => {  
+      if (err) {
+        this.statusCode = 500;
+        this.end(`Error reading file`);
+        return;
+      }
+
+      this.setHeader("Content-Type", contentType);
+      this.end(data);
+    });
+  };    
 
   app.response = Object.create(res, {
     app: {

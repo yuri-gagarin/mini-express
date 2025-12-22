@@ -13,6 +13,13 @@ app.post("/users", (req, res) => {
   return res.status(201).send("Creating user...");
 });
 
+app.get("/send-test", (req, res) => {
+  return res.sendFile("./public/index.html");
+});
+
+app.get("/send-test-fail", (req, res) => {
+  return res.sendFile("./public/doesnotexist.html");
+});
 
 app.get("/about", (req, res) => {
   return res.redirect("/user");
