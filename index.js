@@ -23,6 +23,10 @@ app.post("/users", (req, res) => {
 //   return res.sendFile("./public/doesnotexist.html");
 // });
 
+app.get("/home", (req, res) => { 
+  res.sendFile("./public/index.html");
+});
+
 app.get("/about", (req, res) => {
   return res.redirect("/user");
 });

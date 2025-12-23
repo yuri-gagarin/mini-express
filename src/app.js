@@ -1,6 +1,6 @@
 const http = require("http");
 const methods = require("methods");
-const setPrototypeOf = require("setprototypeof");
+// const setPrototypeOf = require("setprototypeof");
 
 const Layer = require("./layer");
 const Router = require("./router");
@@ -27,7 +27,6 @@ app.lazyrouter = function lazyrouter() {
     this._router = new Router({});
     this._router.use(middleware.init(this));
   }
-
 };
 
 // for the static middleware? //
@@ -59,6 +58,9 @@ app.use = function use(fn) {
 
 
 app.set = function set(setting, val) {
+  if (arguments.length === 1) {
+    return this.settings[setting];
+  }
   this.settings[setting] = val;
 
   switch (setting) {
