@@ -2,7 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const mixin = require("merge-descriptors");
 const path = require("path");
-//
+// 
 const proto = require("./app");
 //
 const { mimeTypes } = require("./constants/mime_types");
@@ -79,6 +79,12 @@ function createApplication() {
     this.statusCode = status;
     this.setHeader("Location", url);
     this.end();
+  };
+
+  res.render = function(view, opts, cb) {
+    const app = this.app;
+    console.log("Value for app in res.render: ", app);
+    this.end("Render called");
   };
 
   res.sendFile = function(filePath, options) {

@@ -23,6 +23,10 @@ app.post("/users", (req, res) => {
 //   return res.sendFile("./public/doesnotexist.html");
 // });
 
+app.get("/render-test", (req, res) => {
+  res.render("index.html", { title: "Test Render" });
+});
+
 app.get("/home", (req, res) => { 
   res.sendFile("./public/index.html");
 });
