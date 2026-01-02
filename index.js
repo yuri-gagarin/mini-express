@@ -3,6 +3,8 @@ const app = express();
 
 app.use("/assets", express.static("public"));
 
+app.set("view engine", "ejs");
+
 app.get("/user", (req, res, next) => {
   res.send({ id: 1, name: "John Doe" });
 });
@@ -28,7 +30,7 @@ app.get("/render-test", (req, res) => {
 });
 
 app.get("/home", (req, res) => { 
-  res.sendFile("./public/index.html");
+  res.render("home", { title: "Home Page Test", heading: "Welcome to the Home Page",  message: "This is a simple message rendered using EJS template engine.",  items: ["Item 1", "Item 2", "Item 3"] });
 });
 
 app.get("/about", (req, res) => {

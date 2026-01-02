@@ -81,10 +81,30 @@ function createApplication() {
     this.end();
   };
 
-  res.render = function(view, opts, cb) {
+  res.render = function(view, data, cb) {
     const app = this.app;
-    console.log("Value for app in res.render: ", app);
-    this.end("Render called");
+    const self = this;
+
+    let callback = cb;
+    if (typeof data === "function") {
+      callback = data;
+      data = {};
+    }
+    
+    // call [app.render] to render the view
+    app.render(view, data, function(err, html) {
+      if (err) {
+        if (callback) return callback(err);
+        self.statusCode = 500;
+        return self.end(`Error rendering view: ${err.message}`);
+      }
+      
+      // eveyrhing is fine, send the html
+      self.setHeader("Content-Type", "text/html");
+      self.end(html);
+
+      if (callback) callback(null, html);
+    });
   };
 
   res.sendFile = function(filePath, options) {

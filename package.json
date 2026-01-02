@@ -7,6 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "array-flatten": "^3.0.0",
+    "ejs": "^3.1.10",
     "flatten": "^1.0.3",
     "merge-descriptors": "^2.0.0",
     "methods": "^1.1.2",

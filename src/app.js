@@ -59,12 +59,31 @@ app.render = function render(name, data, cb) {
   }
 
   let ext = path.extname(name);
+  const viewEngine = this.get("view engine");
+
+  if (!viewEngine) {
+    const err = new Error(`No default view engine set`);
+    return cb(err);
+   }
   // console.log("Rendering view: ", name, " with ext: ", ext);
 
-  res.end(`Rendering view: ${name} with data: ${JSON.stringify(dataToSend)}`);
   // no extension ? then use the default view 
   if (!ext) {
-    const viewEngine = this.get("view engine");
+    ext = viewEngine[0] !== "." ? `.${viewEngine}` : viewEngine;
+    name += ext;
+  }
+
+  const engine = this.engines[ext];
+
+  if (!engine) {
+    const err = new Error(`No view engine registered for extension: ${ext}`);
+    return cb(err);
+  }
+
+  try {
+    engine(name, dataToSend, cb);
+  } catch (err) {
+    return cb(err);
   }
 }
 
@@ -75,6 +94,20 @@ app.set = function set(setting, val) {
   this.settings[setting] = val;
 
   switch (setting) {
+    case "view engine": {
+      // require and register the engine
+      try {
+        const ext = val[0] !== "." ? "." + val : val;
+        const module = require(val);
+        const engine = module.__express || module.renderFile || module;
+        this.engines[ext] = engine;
+        console.log(`Registered view engine for extension ${ext}`);
+        console.log(this.engines);
+        break;
+      } catch (error) {
+        throw new Error(`Failed to load view engine "${val}". Did you install it? (npm install ${val})`);
+      }
+    }
     case "etag": {
       this.set("etag fn", "");
       break;
