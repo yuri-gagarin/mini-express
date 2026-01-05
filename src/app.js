@@ -1,4 +1,5 @@
 const http = require("http");
+const fs = require("fs");
 const methods = require("methods");
 const path = require("path");
 // const setPrototypeOf = require("setprototypeof");
@@ -67,10 +68,23 @@ app.render = function render(name, data, cb) {
    }
   // console.log("Rendering view: ", name, " with ext: ", ext);
 
+
   // no extension ? then use the default view 
   if (!ext) {
     ext = viewEngine[0] !== "." ? `.${viewEngine}` : viewEngine;
     name += ext;
+  }
+
+  // resolve the templates directory
+  const viewsDir = this.get("views") || "./views";
+  const templatePath = path.resolve(viewsDir, name);
+
+  // check for an existing template at its path
+  // we could do this async but for simplicity we'll do sync here
+  const stats = fs.statSync(templatePath);
+  if (!stats || !stats.isFile()) {
+    const err = new Error(`Template not found: ${templatePath}`);
+    return cb(err);
   }
 
   const engine = this.engines[ext];
@@ -81,7 +95,7 @@ app.render = function render(name, data, cb) {
   }
 
   try {
-    engine(name, dataToSend, cb);
+    engine(templatePath, dataToSend, cb);
   } catch (err) {
     return cb(err);
   }
