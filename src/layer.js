@@ -9,14 +9,47 @@ function Layer(path, options, fn) {
   this.name = fn.name || "<anonymous>";
   this.params = null;
   this.path = path;
+  this.params = {};
 
 };
 
 Layer.prototype.match = function match(path) {
-  console.log("Match name: ", this.name);
-
+  // console.log("Match name: ", this.name);
+  
   // matching a specific rout
-  if (this.route && this.route.path === path) {
+  if (this.route) {
+    console.log(`MATCHING: Requested path >>> ${path} to Route >>> ${this.route.path}`);
+    // const routePath = this.route.path;
+    // console.log("Working");
+    // console.log("Path: ", path);
+    // console.log("Route: ", routePath);
+    const routePath = this.route.path;
+
+    // split to compare 
+    const routeSegments = routePath.split("/");
+    const pathSegments = path.split("/");
+
+    // path and routePath have to have same number of segments
+    if (routeSegments.length !== pathSegments.length) {
+      return false;
+    }
+
+    // compare the segments
+    for (let i = 0; i < routeSegments.length; i++) {
+      const routeSeg = routeSegments[i];
+      const pathSeg = pathSegments[i];
+
+      // static segment mismatch? return false immediately
+      if (!routeSeg.startsWith(":") && routeSeg !== pathSeg) {
+        return false;
+      }
+
+      // If we find a parameter, extract it
+      if (routeSeg.startsWith(":")) {
+        const paramName = routeSeg.slice(1);
+        this.params[paramName] = pathSeg;
+      }
+    }
     return true;
   }
 

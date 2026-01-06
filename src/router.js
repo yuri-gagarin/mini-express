@@ -76,6 +76,9 @@ proto.handle = function handle(req, res, out) {
           continue;
         }
 
+        // set the params to the [req] object
+        req.params = layer.params;
+
         if (!route) {
           // process non route handler (middleware)
           console.log("Calling static!")

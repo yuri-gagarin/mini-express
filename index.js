@@ -9,6 +9,12 @@ app.get("/user", (req, res, next) => {
   res.send({ id: 1, name: "John Doe" });
 });
 
+app.get("/user/:id", (req, res, next) => {
+  const userId = 1;
+  console.log("Route params: ", req.params);
+  res.send({ id: userId, name: `User ${userId}` });
+});
+
 app.get("/users", (req, res, next) => {
   res.send([{ id: 1, name: "John Doe" }, { id: 2, name: "Jane Smith" }]);
 });
