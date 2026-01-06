@@ -59,7 +59,7 @@ proto.handle = function handle(req, res, out) {
     function next() {
       try {
       // resolve the URL path from the {req} object
-      let path = getPathName(req);
+      let { pathname, query } = getPathName(req);
 
       let layer;
       let match;
@@ -67,7 +67,7 @@ proto.handle = function handle(req, res, out) {
 
       while (match !== true && index < stack.length) {
         layer = stack[index++];
-        match = matchLayer(layer, path);
+        match = matchLayer(layer, pathname );
         route = layer.route;
         // console.log("Route found: ", route);
         // console.log("Method: ", req.method);
@@ -78,6 +78,7 @@ proto.handle = function handle(req, res, out) {
 
         // set the params to the [req] object
         req.params = layer.params;
+        req.query = processQueryParams(query);
 
         if (!route) {
           // process non route handler (middleware)
@@ -127,14 +128,20 @@ proto.use = function use(path, fn) {
   return this;
 };
 
+/**
+ * 
+ * @param {object} req 
+ * @returns {object|null}
+ */
 function getPathName(req) {
   try {
     if (req && typeof req === "object") {
       console.log("Parsing URL for request: ", req.url);
-      return parseUrl(req).pathname;
+      const { pathname, query } = parseUrl(req);
+      return { pathname, query };
     }
     if (req && typeof req === "function") {
-      return "";
+      return null;
     }
     return null;
   } catch (error) {
@@ -143,6 +150,31 @@ function getPathName(req) {
     process.exit(1);
   }
 }
+
+function processQueryParams(queryString) {
+  try {
+
+    if (typeof queryString !== "string") {
+      return {};
+    }
+
+    const query = {};
+    if (queryString) {
+      // example: name=John&last=Smith
+      const pairs = queryString.split("&"); 
+      for (const pair of pairs) {
+        const [key, value] = pair.split("=");
+        query[decodeURIComponent(key)] = decodeURIComponent(value || "");
+      }
+    }
+    return query;
+
+  } catch (error) {
+    console.log("Module: Router - [processQueryParams] Error");
+    console.error(error);
+    process.exit(1);
+  }
+};
 
 function matchLayer(layer, path) {
   try {

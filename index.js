@@ -6,6 +6,7 @@ app.use("/assets", express.static("public"));
 app.set("view engine", "ejs");
 
 app.get("/user", (req, res, next) => {
+  console.log("Query params: ", req.query);
   res.send({ id: 1, name: "John Doe" });
 });
 
